@@ -1,0 +1,42 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Bayesbench Output Schema",
+  "required": [
+    "cfg"
+  ],
+  "properties": {
+    "cfg": {
+      "$id": "#/properties/cfg",
+      "type": "object",
+      "title": "An Bayesbench Config Object"
+    },
+    "posterior": {
+      "$id": "#/properties/posterior",
+      "type": "object",
+      "title": "Posterior with one array per parameter"
+    },
+    "diagnostics": {
+      "$id": "#/properties/output_directory",
+      "type": "object",
+      "title": "Components needed for diagnostics"
+      }
+    },
+    "method_diagnostic": {
+      "$id": "#/properties/posterior_database_path",
+      "type": "object",
+      "title": "Method specific diagnostic to the Inference engine"
+    },
+    "text_log": {
+      "$id": "#/properties/posterior_name",
+      "type": "array",
+      "title": "An array of loged output",
+      "items": {
+        "$id": "#/properties/posterior_name/items",
+        "type": "string",
+        "title": "Posteriors in the posterior database"
+      }
+    }
+}

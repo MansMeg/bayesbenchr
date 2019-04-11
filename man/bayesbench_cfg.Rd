@@ -21,7 +21,7 @@ Bayesbench config
 Creates a Bayesbench configuration file. The only
 }
 \examples{
-path <- system.file("extdata", "examples", "test_8schools_advi.yml", package = "bayesbenchr")
-x <- read_bayesbench_cfg_from_file(path)
+file_path <- system.file("extdata", "examples", "test_8schools_advi.yml", package = "bayesbenchr")
+x <- read_bayesbench_cfg_from_file(file_path)
 
 }

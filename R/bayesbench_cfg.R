@@ -72,10 +72,16 @@ assert_bayesbench_cfg <- function(x){
 }
 
 
-bayesbench_cfg_toJSON <- function(x){
+bayesbench_cfg_json_prepare <- function(x){
   checkmate::assert_class(x, classes = c("bayesbench_cfg"))
   x$output_directory <- jsonlite::unbox(x$output_directory)
   x$posterior_database_path <- jsonlite::unbox(x$posterior_database_path)
+  x
+}
+
+bayesbench_cfg_toJSON <- function(x){
+  checkmate::assert_class(x, classes = c("bayesbench_cfg"))
+  x <- bayesbench_cfg_json_prepare(x)
   x <- jsonlite::toJSON(x, pretty = TRUE)
   x
 }
