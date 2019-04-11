@@ -2,10 +2,16 @@
 % Please edit documentation in R/ie_stan_advi.R
 \name{bayesbench_stan_advi}
 \alias{bayesbench_stan_advi}
-\title{Run Stan VB}
+\title{Run Stan VB functionality}
 \usage{
 bayesbench_stan_advi(cfg)
 }
+\arguments{
+\item{cfg}{a \code{bayesbench_cfg} config object}
+}
+\value{
+a \code{bayesbench_output} object
+}
 \description{
-Run Stan VB
+Run Stan VB functionality
 }

@@ -3,11 +3,14 @@
 \name{bayesbench_cfg}
 \alias{bayesbench_cfg}
 \alias{read_bayesbench_cfg_from_file}
+\alias{write_bayesbench_cfg_to_file}
 \title{Bayesbench config}
 \usage{
 bayesbench_cfg(...)
 
 read_bayesbench_cfg_from_file(file_path)
+
+write_bayesbench_cfg_to_file(cfg, file_path)
 }
 \arguments{
 \item{...}{Bayesbench parameters to set.}

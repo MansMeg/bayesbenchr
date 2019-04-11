@@ -28,12 +28,25 @@ read_bayesbench_cfg_from_file <- function(file_path){
   parse_read_cfg_object(cfg_object)
 }
 
+#' @rdname bayesbench_cfg
+#' @export
+write_bayesbench_cfg_to_file <- function(cfg, file_path){
+  checkmate::assert_class(cfg, "bayesbench_cfg")
+  checkmate::assert_path_for_output(file_path)
+  file_ext <- file_extension(file_path)
+  checkmate::assert_choice(file_ext, choices = c("yaml", "yml", "json"))
+  if(file_ext %in% c("yaml", "yml")){
+    yaml::write_yaml(x = cfg, file = file_path)
+  } else if (file_ext %in% c("json")){
+    jsonlite::write_json(bayesbench_cfg_toJSON(cfg), path = file_path)
+  } 
+  return(invisible(TRUE))
+}
 
 file_extension <- function(x){
   x <- strsplit(x, "\\.")[[1]]
   x[length(x)]
 }
-
 
 parse_read_cfg_object <- function(x){
   checkmate::assert_list(x)

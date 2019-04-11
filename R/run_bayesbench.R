@@ -10,7 +10,7 @@
 #' cfg <- read_bayesbench_cfg_from_file(path)
 #' 
 #' @export
-run_bayesbench <- function(cfg){
+bayesbench_run <- function(cfg){
   if(checkmate::test_class(cfg, "bayesbench_cfg")){
     cfg <- list(cfg)
   }
@@ -34,3 +34,39 @@ run_bayesbench <- function(cfg){
   return(results)
 }
 
+#' @rdname bayesbench_run
+#' @param bash_folder Folder to write bash scripts to
+#' @export
+bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench"){
+  if(checkmate::test_class(cfg, "bayesbench_cfg")){
+    cfg <- list(cfg)
+  }
+  for(i in seq_along(cfg)){
+    checkmate::assert_class(cfg[[i]], "bayesbench_cfg")
+  }
+  # cfg is a list of bayesbench_cfg objects from now on.
+  
+  # Create job configs
+  cfgs <- expand_bayesbench_cfg_to_job_cfgs(cfg)
+  
+  # Create temp dir for runs  
+  dir.create(bash_folder, showWarnings = FALSE)
+  dir.create(file.path(bash_folder, "cfgs"), showWarnings = FALSE)
+  
+  # Copy run_bayesbench
+  file.copy(system.file("extdata", "rscripts", "bayesbench.R", package = "bayesbenchr"),
+            file.path(bash_folder, "bayesbench.R"), overwrite = TRUE)
+
+  # Create configs
+  cfg_path <- character(length(cfgs))
+  for(i in seq_along(cfgs)){
+    cfg_path[i] <- file.path(bash_folder, "cfgs", paste0("cfg",i,".yml"))
+    write_bayesbench_cfg_to_file(cfg = cfgs[[i]], cfg_path[i])
+  }
+  
+  # Create bash
+  bash_file <- c("#!/bin/bash", "", paste0("Rscript ", file.path(bash_folder, "bayesbench.R"), " --cfg_path=\"", cfg_path, "\""))
+  writeLines(bash_file, con = file.path(bash_folder, "run_bayesbench.sh"))
+  # Convert to bayesbench output
+  return(results)
+}
