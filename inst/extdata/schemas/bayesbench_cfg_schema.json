@@ -1,0 +1,54 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Bayesbench Configuration Schema",
+  "required": [
+    "inference_engine",
+    "posterior_name"
+  ],
+  "properties": {
+    "inference_engine": {
+      "$id": "#/properties/inference_engine",
+      "type": "array",
+      "title": "An array of inference engines",
+      "items": {
+        "$id": "#/properties/inference_engine/items",
+        "type": "string",
+        "title": "The inference engine to use",
+        "examples": [
+          "bayesbench_stan_advi_meanfield"
+        ]
+      }
+    },
+    "method_specific_arguments": {
+      "$id": "#/properties/method_specific_arguments",
+      "type": "object",
+      "title": "Methods specific arguments are sent to inference engine"
+    },
+    "output_directory": {
+      "$id": "#/properties/output_directory",
+      "type": "string",
+      "title": "The output directory for running jobs"
+      }
+    },
+    "posterior_database_path": {
+      "$id": "#/properties/posterior_database_path",
+      "type": "string",
+      "title": "The Posterior_database_path Schema"
+    },
+    "posterior_name": {
+      "$id": "#/properties/posterior_name",
+      "type": "array",
+      "title": "An array of posterior names",
+      "items": {
+        "$id": "#/properties/posterior_name/items",
+        "type": "string",
+        "title": "Posteriors in the posterior database",
+        "examples": [
+          "8_schools_noncentered"
+        ]
+      }
+    }
+}

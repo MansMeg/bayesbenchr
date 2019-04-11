@@ -1,0 +1,20 @@
+
+- diagnostics:
+  - psis_khat
+  inference_engine: bayesbench_stan_advi_meanfield
+  method_specific_arguments:
+    iter: 1000
+    tol_rel_obj: [0.01, 0.0001]
+  output_directory: out
+  posterior_database_path: /home/eero/default_posterior_db
+  posterior_name: 8_schools_noncentered
+
+- diagnostics:
+  - psis_khat
+  inference_engine: bayesbench_stan_advi_fullrank
+  method_specific_arguments:
+    iter: [1000, 10000]
+    tol_rel_obj: 0.01
+  output_directory: out
+  posterior_database_path: /home/eero/default_posterior_db
+  posterior_name: [8_schools_noncentered, 8_schools_centered]
