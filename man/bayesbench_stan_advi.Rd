@@ -15,3 +15,6 @@ a \code{bayesbench_output} object
 \description{
 Run Stan VB functionality
 }
+\details{
+Runs Stans VB inferences.
+}

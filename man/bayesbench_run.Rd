@@ -20,5 +20,6 @@ Run Bayesbench for a given set of configurations
 \examples{
 path <- system.file("extdata", "examples", "test_8schools_advi.yml", package = "bayesbenchr")
 cfg <- read_bayesbench_cfg_from_file(path)
+# results <- bayesbench_run(cfg)
 
 }

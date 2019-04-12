@@ -5,8 +5,8 @@
 \title{Create a Bayesbench ouput object}
 \usage{
 bayesbench_output(cfg, posterior, posterior_predictive = NULL,
-  log_p = NULL, log_g = NULL, method_diagnostic = NULL,
-  text_log = NULL)
+  log_p = NULL, log_g = NULL, inference_engine_content = NULL,
+  output_log = NULL)
 }
 \arguments{
 \item{cfg}{The config object to return}
@@ -17,11 +17,11 @@ bayesbench_output(cfg, posterior, posterior_predictive = NULL,
 
 \item{log_p}{The log target density (log posterior mostly) for each draw}
 
-\item{method_diagnostic}{a list of method specific diagnostics (these need sto be handled separately)}
-
-\item{text_log}{eventual output during inference engine run}
+\item{inference_engine_content}{a list of inference_engine specific content (these need stored be handled separately)}
 
 \item{log_q}{The log proposal density (log approximate posterior) for each draw}
+
+\item{text_log}{eventual output during inference engine run}
 }
 \description{
 Create a Bayesbench ouput object

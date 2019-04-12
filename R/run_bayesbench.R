@@ -8,6 +8,7 @@
 #' @examples 
 #' path <- system.file("extdata", "examples", "test_8schools_advi.yml", package = "bayesbenchr")
 #' cfg <- read_bayesbench_cfg_from_file(path)
+#' # results <- bayesbench_run(cfg)
 #' 
 #' @export
 bayesbench_run <- function(cfg){
@@ -25,11 +26,20 @@ bayesbench_run <- function(cfg){
   # Check that all configs are ok.
   
   # Run all jobs
+  pb <- progress::progress_bar$new(format = "Running Bayesbench [:bar] :percent in :elapsed", total = length(cfgs), clear = FALSE)
   results <- list()
   for(i in seq_along(cfgs)){
+    pb$tick()
+    start_time <- Sys.time()
     eval(parse(text = paste0("results[[i]] <- ", cfgs[[i]]$inference_engine, "(cfgs[[i]])")))
+    end_time <- Sys.time()
+    #add_start_time(results[[i]]) <- start_time
+    #add_end_time(results[[i]]) <- end_time
   }
   
+  # Write results
+  write_bayesbench_output(results)
+
   # Convert to bayesbench output
   return(results)
 }
@@ -68,5 +78,7 @@ bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench"){
   bash_file <- c("#!/bin/bash", "", paste0("Rscript ", file.path(bash_folder, "bayesbench.R"), " --cfg_path=\"", cfg_path, "\""))
   writeLines(bash_file, con = file.path(bash_folder, "run_bayesbench.sh"))
   # Convert to bayesbench output
-  return(results)
+  
+  cat("Run ", file.path(bash_folder, "run_bayesbench.sh"), " in bash.\n")
+  return(invisible(TRUE))
 }
