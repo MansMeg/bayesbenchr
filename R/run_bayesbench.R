@@ -30,6 +30,10 @@ bayesbench_run <- function(cfg){
   results <- list()
   for(i in seq_along(cfgs)){
     pb$tick()
+    if(file.exists(output_file_path(cfgs[[i]]))) {
+      message("Skipped ", config_name(cfgs[[i]]), " (set \"output force: true\" to force job).")
+      next()
+    }
     start_time <- Sys.time()
     inference_engine <- inference_engine_function(cfgs[[i]])
     results[[i]] <- inference_engine(cfg = cfgs[[i]])

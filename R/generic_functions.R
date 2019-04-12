@@ -45,6 +45,27 @@ config_name.bayesbench_output <- function(x){
   config_name(x$cfg)
 }
 
+#' @export
+output_file_path <- function(x){
+  UseMethod("output_file_path", x)
+}
+
+output_file_path.bayesbench_cfg <- function(x){
+  file_ext <- output_type(x)
+  if(file_ext == "zip") file_ext <- "json.zip"
+  fp <- file.path(output_directory(x), output_name(x))
+  fp <- paste0(fp, ".", file_ext)
+  fp
+}
+
+output_file_path.bayesbench_job_cfg <- function(x){
+  output_file_path.bayesbench_cfg(x)
+}
+
+output_file_path.bayesbench_output <- function(x){
+  output_file_path(x$cfg)
+}
+
 
 #' @export
 output_name <- function(x){
@@ -67,6 +88,10 @@ output_directory<- function(x){
 
 output_directory.bayesbench_cfg <- function(x){
   x$output$directory
+}
+
+output_directory.bayesbench_job_cfg <- function(x){
+  output_directory.bayesbench_cfg(x)
 }
 
 output_directory.bayesbench_output <- function(x){

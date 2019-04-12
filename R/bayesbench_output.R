@@ -61,37 +61,34 @@ print.bayesbench_output <- function(x,...){
 
 write_bayesbench_outputs <- function(bayesbench_outputs){
   if(checkmate::test_class(bayesbench_outputs, "bayesbench_output")){
-    cfg <- list(cfg)
+    bayesbench_outputs <- list(bayesbench_outputs)
   }
-  for(i in seq_along(cfg)){
-    checkmate::assert_class(bayesbench_outputs[[i]], "bayesbench_output")
+  for(i in seq_along(bayesbench_outputs)){
+    checkmate::assert_class(bayesbench_outputs[[i]], "bayesbench_output", null.ok = TRUE)
   }
   
-  tmpfn <- tempfile()
   for(i in seq_along(bayesbench_outputs)){
+    if(is.null(bayesbench_outputs[[i]])) next()
     dir.create.bayesbench_output(bayesbench_outputs[[i]])
-    write_bayesbench_output(bayesbench_outputs[[i]], output_name(bayesbench_outputs[[i]]))
+    write_bayesbench_output(bayesbench_output = bayesbench_outputs[[i]])
   }
   return(TRUE)
 }
 
-write_bayesbench_output <- function(bayesbench_output, file_name){
+write_bayesbench_output <- function(bayesbench_output){
   checkmate::assert_class(bayesbench_output, "bayesbench_output")
+  file_name <- output_name(bayesbench_output)
+  ofp <- output_file_path(bayesbench_output)
   if(output_type(bayesbench_output) == "zip"){
     bbojson <- bayesbench_output_toJSON(bayesbench_output)
-    file_name <- paste0(file_name, ".json")
     tmp_file_path <- file.path(tempdir(), file_name)
     writeLines(tmp_file_path, text = bbojson)
-    zip(files = tmp_file_path, zipfile = file.path(output_directory(bayesbench_output), paste0(file_name, ".zip")), flags = "-j")
+    zip(files = tmp_file_path, zipfile = ofp, flags = "-j")
   } else if(output_type(bayesbench_output) == "json"){
     bbojson <- bayesbench_output_toJSON(bayesbench_output)
-    file_name <- paste0(file_name, ".json")
-    file_path <- file.path(output_directory(bayesbench_output), file_name)
-    writeLines(file_path, text = bbojson)
+    writeLines(con = ofp, text = bbojson)
   } else if(output_type(bayesbench_output) == "rda") {
-    file_name <- paste0(file_name, ".rda")
-    file_path <- file.path(output_directory(bayesbench_output), file_name)
-    save(bayesbench_output, file = file_path)
+    save(bayesbench_output, file = ofp)
   } else{
     stop(output_type(bayesbench_output), "not implemented.")
   }
