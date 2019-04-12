@@ -25,7 +25,7 @@ read_bayesbench_cfg_from_file <- function(file_path){
   } else if (file_ext %in% c("json")){
     cfg_object <- jsonlite::read_json(file_path)
   } 
-  parse_read_cfg_object(cfg_object)
+  parse_read_cfg_object(x = cfg_object)
 }
 
 #' @rdname bayesbench_cfg
@@ -71,6 +71,12 @@ parse_cfg_list <- function(cfgs){
   cfg_list <- list()
   for(i in seq_along(cfgs)){
     cfg_list[[i]] <- bayesbench_cfg_from_list(cfgs[[i]])
+    if(is.null(cfg_list[[i]]$config_name)) {
+      # Add config names if missing
+      cfg_list[[i]]$config_name <- make.names(paste0("temp_config_",i,"_", Sys.time()))
+      cfg_list[[i]] <- cfg_list[[i]][c(length(cfg_list[[i]]),1:(length(cfg_list[[i]]) - 1))]
+    }
+    cfg_list[[i]] <- bayesbench_cfg_from_list(cfg_list[[i]]) # Just to reorder
   }
   cfg_list
 }
@@ -87,7 +93,8 @@ assert_bayesbench_cfg <- function(x){
 
 bayesbench_cfg_json_prepare <- function(x){
   checkmate::assert_class(x, classes = c("bayesbench_cfg"))
-  x$output_directory <- jsonlite::unbox(x$output_directory)
+  x$output$directory <- jsonlite::unbox(x$output$directory)
+  x$config_name <- jsonlite::unbox(x$config_name)
   x$posterior_database_path <- jsonlite::unbox(x$posterior_database_path)
   x
 }
@@ -125,7 +132,7 @@ expand_bayesbench_cfg_to_job_cfgs <- function(cfg){
   }
   all_jobs <- list()
   for(i in seq_along(cfg)){
-    all_jobs <- c(all_jobs, bayesbench_job_cfg_from_cfg(cfg[[i]]))
+    all_jobs <- c(all_jobs, bayesbench_job_cfg_from_cfg(x = cfg[[i]]))
   }
   all_jobs
 }
@@ -135,8 +142,8 @@ bayesbench_job_cfg_from_cfg <- function(x){
   expand_list <- list()
   expand_list[["inference_engine"]] <- x$inference_engine
   expand_list[["posterior_name"]] <- x$posterior_name
-  for(i in seq_along(x$method_specific_arguments)){
-    if(length(x$method_specific_arguments[[i]]) > 1) expand_list[[names(x$method_specific_arguments)[i]]] <- x$method_specific_arguments[[i]]
+  for(i in seq_along(x$inference_engine_arguments)){
+    if(length(x$inference_engine_arguments[[i]]) > 1) expand_list[[names(x$inference_engine_arguments)[i]]] <- x$inference_engine_arguments[[i]]
   }
   expand_df <- expand.grid(expand_list, stringsAsFactors = FALSE)
   if(nrow(expand_df) == 1) {
@@ -145,10 +152,11 @@ bayesbench_job_cfg_from_cfg <- function(x){
   job_cfg_list <- list()
   for(i in 1:nrow(expand_df)){
     job_cfg_list[[i]] <- x
+    job_cfg_list[[i]]$config_name <- paste0(job_cfg_list[[i]]$config_name, "_job", i)
     job_cfg_list[[i]]$inference_engine <- expand_df$inference_engine[i]
     job_cfg_list[[i]]$posterior_name <- expand_df$posterior_name[i]
     for(j in 3:ncol(expand_df)){
-      job_cfg_list[[i]]$method_specific_arguments[[names(expand_df)[j]]] <- expand_df[i,j]
+      job_cfg_list[[i]]$inference_engine_arguments[[names(expand_df)[j]]] <- expand_df[i,j]
     }
     job_cfg_list[[i]] <- bayesbench_job_cfg(job_cfg_list[[i]])
   }
@@ -161,8 +169,8 @@ bayesbench_job_cfg <- function(x){
   x <- bayesbench_cfg(x)
   checkmate::assert_string(x$inference_engine)
   checkmate::assert_string(x$posterior_name)
-  for(i in seq_along(x$method_specific_arguments)){
-    checkmate::assert_true(length(x$method_specific_arguments[[i]]) == 1L)
+  for(i in seq_along(x$inference_engine_arguments)){
+    checkmate::assert_true(length(x$inference_engine_arguments[[i]]) == 1L)
   }
   class(x) <- c("bayesbench_job_cfg", class(x))
   x

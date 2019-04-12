@@ -22,15 +22,20 @@
         ]
       }
     },
-    "method_specific_arguments": {
+    "config_name": {
+      "$id": "#/properties/posterior_database_path",
+      "type": "string",
+      "title": "The config name, default to temp_config_YYYY.MM.DD.HH.MM.SS"
+    },
+    "inference_engine_arguments": {
       "$id": "#/properties/method_specific_arguments",
       "type": "object",
       "title": "Methods specific arguments are sent to inference engine"
     },
-    "output_directory": {
+    "output": {
       "$id": "#/properties/output_directory",
-      "type": "string",
-      "title": "The output directory for running jobs"
+      "type": "object",
+      "title": "The output parameters"
       }
     },
     "posterior_database_path": {

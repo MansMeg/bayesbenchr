@@ -31,23 +31,27 @@ bayesbench_run <- function(cfg){
   for(i in seq_along(cfgs)){
     pb$tick()
     start_time <- Sys.time()
-    eval(parse(text = paste0("results[[i]] <- ", cfgs[[i]]$inference_engine, "(cfgs[[i]])")))
+    eval(parse(text = paste0("results[[i]] <- ", cfgs[[i]]$inference_engine, "(cfg = cfgs[[i]])")))
     end_time <- Sys.time()
+    if(verbose(results[[i]])) cat(results[[i]]$output_log, sep = "\n")
     #add_start_time(results[[i]]) <- start_time
     #add_end_time(results[[i]]) <- end_time
   }
   
   # Write results
-  write_bayesbench_output(results)
+  write_bayesbench_outputs(bayesbench_outputs = results)
 
-  # Convert to bayesbench output
-  return(results)
+  # Warnings
+  warning("diagnostics not implemented yet")
+  
+  return(invisible(results))
 }
 
 #' @rdname bayesbench_run
 #' @param bash_folder Folder to write bash scripts to
+#' @param cores how many files to run (to start as differet processes)
 #' @export
-bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench"){
+bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench", processes = 1){
   if(checkmate::test_class(cfg, "bayesbench_cfg")){
     cfg <- list(cfg)
   }
@@ -78,7 +82,14 @@ bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench"){
   bash_file <- c("#!/bin/bash", "", paste0("Rscript ", file.path(bash_folder, "bayesbench.R"), " --cfg_path=\"", cfg_path, "\""))
   writeLines(bash_file, con = file.path(bash_folder, "run_bayesbench.sh"))
   # Convert to bayesbench output
-  
-  cat("Run ", file.path(bash_folder, "run_bayesbench.sh"), " in bash.\n")
+  if(processes>1){
+    cfg_path_idx <- rep(1:processes, ceiling(length(cfg_path)/processes))[1:length(cfg_path)]
+    for(i in 1:processes){
+      bash_file <- c("#!/bin/bash", "", paste0("Rscript ", file.path(bash_folder, "bayesbench.R"), " --cfg_path=\"", cfg_path[cfg_path_idx == i], "\""))
+      writeLines(bash_file, con = file.path(bash_folder, paste0("run_bayesbench", i, ".sh")))
+    }
+  }
+
+  cat("Run bash", file.path(bash_folder, "run_bayesbench.sh"), "in terminal.\n")
   return(invisible(TRUE))
 }

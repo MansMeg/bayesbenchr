@@ -12,9 +12,10 @@ bayesbench_stan_advi <- function(cfg){
   pnm <- posterior_name(cfg)
   scf <- stancode_file_path(cfg)
   sd <- jsonlite::read_json(data_file_path(cfg), simplifyVector = TRUE)
-  ie_args <- method_specific_arguments(cfg)
+  ie_args <- inference_engine_arguments(cfg)
 
   require(rstan)
+  rstan_options(auto_write = TRUE)
   sm <- rstan::stan_model(file = scf, model_name = make.names(pnm))
   args <- c(list(object = sm, data = sd), ie_args)
   suppressMessages(suppressWarnings(logs <- capture.output(results <- do.call(what = rstan::vb, args))))
@@ -24,6 +25,6 @@ bayesbench_stan_advi <- function(cfg){
                          log_p = results@sim$diagnostics[[1]]$log_p__,
                          log_g = results@sim$diagnostics[[1]]$log_g__,
                          inference_engine_content = results@sim$diagnostics[2:length(results@sim$diagnostics)],
-                         text_log = logs)
+                         output_log = logs)
   return(x)
 }

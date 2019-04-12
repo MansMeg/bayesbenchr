@@ -7,12 +7,15 @@
 \usage{
 bayesbench_run(cfg)
 
-bayesbench_bash_run(cfg, bash_folder = "temp_bayesbench")
+bayesbench_bash_run(cfg, bash_folder = "temp_bayesbench",
+  processes = 1)
 }
 \arguments{
 \item{cfg}{a \code{bayesbench_cfg} object or a list of \code{bayesbench_cfg} object.}
 
 \item{bash_folder}{Folder to write bash scripts to}
+
+\item{cores}{how many files to run (to start as differet processes)}
 }
 \description{
 Run Bayesbench for a given set of configurations

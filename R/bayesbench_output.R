@@ -59,7 +59,7 @@ print.bayesbench_output <- function(x,...){
 
 
 
-write_bayesbench_output <- function(bayesbench_outputs){
+write_bayesbench_outputs <- function(bayesbench_outputs){
   if(checkmate::test_class(bayesbench_outputs, "bayesbench_output")){
     cfg <- list(cfg)
   }
@@ -70,14 +70,35 @@ write_bayesbench_output <- function(bayesbench_outputs){
   tmpfn <- tempfile()
   for(i in seq_along(bayesbench_outputs)){
     dir.create.bayesbench_output(bayesbench_outputs[[i]])
-    bbojson <- bayesbench_output_toJSON(bayesbench_outputs[[i]])
-    file_name <- paste0("bayesbench_output_", i, ".json")
-    tmp_file_path <- file.path(tempdir(), file_name)
-    writeLines(tmp_file_path, text = bbojson)
-    zip(files = tmp_file_path, zipfile = file.path(output_directory(bayesbench_outputs[[1]]), paste0(file_name, ".zip")), flags = "-j")
+    write_bayesbench_output(bayesbench_outputs[[i]], output_name(bayesbench_outputs[[i]]))
   }
   return(TRUE)
 }
+
+write_bayesbench_output <- function(bayesbench_output, file_name){
+  checkmate::assert_class(bayesbench_output, "bayesbench_output")
+  if(output_type(bayesbench_output) == "zip"){
+    bbojson <- bayesbench_output_toJSON(bayesbench_output)
+    file_name <- paste0(file_name, ".json")
+    tmp_file_path <- file.path(tempdir(), file_name)
+    writeLines(tmp_file_path, text = bbojson)
+    zip(files = tmp_file_path, zipfile = file.path(output_directory(bayesbench_output), paste0(file_name, ".zip")), flags = "-j")
+  } else if(output_type(bayesbench_output) == "json"){
+    bbojson <- bayesbench_output_toJSON(bayesbench_output)
+    file_name <- paste0(file_name, ".json")
+    file_path <- file.path(output_directory(bayesbench_output), file_name)
+    writeLines(file_path, text = bbojson)
+  } else if(output_type(bayesbench_output) == "rda") {
+    file_name <- paste0(file_name, i, ".rda")
+    file_path <- file.path(output_directory(bayesbench_output), file_name)
+    save(bayesbench_output, file = file_path)
+  } else{
+    stop(output_type(bayesbench_output), "not implemented.")
+  }
+  return(TRUE)
+}
+
+
 
 dir.create.bayesbench_output <- function(bayesbench_output){
   checkmate::assert_class(bayesbench_output, "bayesbench_output")

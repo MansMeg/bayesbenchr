@@ -1,7 +1,7 @@
 # Get method specific arguments
-method_specific_arguments <- function(cfg){
+inference_engine_arguments <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")
-  cfg$method_specific_arguments
+  cfg$inference_engine_arguments
 }
 
 posterior_name <- function(cfg){
