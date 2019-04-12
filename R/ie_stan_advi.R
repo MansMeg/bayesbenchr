@@ -6,7 +6,7 @@
 #' @param cfg a \code{bayesbench_cfg} config object
 #'
 #' @return a \code{bayesbench_output} object
-bayesbench_stan_advi <- function(cfg){
+stan_advi <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")
   
   pnm <- posterior_name(cfg)
@@ -27,4 +27,8 @@ bayesbench_stan_advi <- function(cfg){
                          inference_engine_content = results@sim$diagnostics[2:length(results@sim$diagnostics)],
                          output_log = logs)
   return(x)
+}
+
+bayesbench_stan_advi <- function(cfg){
+  stan_advi(cfg)
 }

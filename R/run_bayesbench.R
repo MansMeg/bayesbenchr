@@ -22,7 +22,7 @@ bayesbench_run <- function(cfg){
 
   # Create job configs
   cfgs <- expand_bayesbench_cfg_to_job_cfgs(cfg)
-  
+
   # Check that all configs are ok.
   
   # Run all jobs
@@ -31,7 +31,8 @@ bayesbench_run <- function(cfg){
   for(i in seq_along(cfgs)){
     pb$tick()
     start_time <- Sys.time()
-    eval(parse(text = paste0("results[[i]] <- ", cfgs[[i]]$inference_engine, "(cfg = cfgs[[i]])")))
+    inference_engine <- inference_engine_function(cfgs[[i]])
+    results[[i]] <- inference_engine(cfg = cfgs[[i]])
     end_time <- Sys.time()
     if(verbose(results[[i]])) cat(results[[i]]$output_log, sep = "\n")
     #add_start_time(results[[i]]) <- start_time
@@ -42,7 +43,7 @@ bayesbench_run <- function(cfg){
   write_bayesbench_outputs(bayesbench_outputs = results)
 
   # Warnings
-  warning("diagnostics not implemented yet")
+  warning("diagnostics not implemented yet", call. = FALSE)
   
   return(invisible(results))
 }
@@ -74,7 +75,7 @@ bayesbench_bash_run <- function(cfg, bash_folder = "temp_bayesbench", processes 
   # Create configs
   cfg_path <- character(length(cfgs))
   for(i in seq_along(cfgs)){
-    cfg_path[i] <- file.path(bash_folder, "cfgs", paste0("cfg",i,".yml"))
+    cfg_path[i] <- file.path(bash_folder, "cfgs", paste0(config_name(cfgs[[i]]),".yml"))
     write_bayesbench_cfg_to_file(cfg = cfgs[[i]], cfg_path[i])
   }
   

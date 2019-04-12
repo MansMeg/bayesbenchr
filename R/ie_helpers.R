@@ -1,3 +1,15 @@
+#' Return the job configs from a config object
+get_job_configs <- function(cfg){
+  if(checkmate::test_class(cfg, "bayesbench_cfg")){
+    cfg <- list(cfg)
+  }
+  for(i in seq_along(cfg)){
+    checkmate::assert_class(cfg[[i]], "bayesbench_cfg")
+  }
+  expand_bayesbench_cfg_to_job_cfgs(cfg)
+}
+
+
 # Get method specific arguments
 inference_engine_arguments <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")

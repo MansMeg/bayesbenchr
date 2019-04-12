@@ -89,7 +89,7 @@ write_bayesbench_output <- function(bayesbench_output, file_name){
     file_path <- file.path(output_directory(bayesbench_output), file_name)
     writeLines(file_path, text = bbojson)
   } else if(output_type(bayesbench_output) == "rda") {
-    file_name <- paste0(file_name, i, ".rda")
+    file_name <- paste0(file_name, ".rda")
     file_path <- file.path(output_directory(bayesbench_output), file_name)
     save(bayesbench_output, file = file_path)
   } else{
