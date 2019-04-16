@@ -1,4 +1,4 @@
-#' Run Stan VB functionality
+#' Run Stan VB
 #' 
 #' @details 
 #' Runs Stans VB inferences.
@@ -60,7 +60,7 @@ stan_sampling <- function(cfg){
   return(x)
 }
 
-#' Run Stan MCMC
+#' Run Stan optimizing/laplace
 #' 
 #' @param cfg a \code{bayesbench_cfg} config object
 #'
