@@ -19,6 +19,10 @@ bayesbench_cfg <- function(...){
   }
   checkmate::assert_list(cfg)
   checkmate::assert_names(names(cfg), must.include = c("inference_engine", "posterior_name"))
+  if(is.null(cfg$config_name)) {
+    cfg$config_name <- make.names(paste0("temp_config_", Sys.time()))
+    cfg <- cfg[c(length(cfg), 1:(length(cfg)-1))]
+  }
   class(cfg) <- c("bayesbench_cfg", "list")
   assert_bayesbench_cfg(cfg)
   cfg
@@ -29,8 +33,19 @@ bayesbench_job_cfg <- function(x){
   x <- bayesbench_cfg(x)
   checkmate::assert_string(x$inference_engine)
   checkmate::assert_string(x$posterior_name)
-  for(i in seq_along(x$inference_engine_arguments)){
-    checkmate::assert_true(length(x$inference_engine_arguments[[i]]) == 1L)
+  
+  ie_args <- x$inference_engine_arguments
+  i <- 1
+  while(i <= length(ie_args)){
+    if(is.list(ie_args[[i]])){
+      sublist <- ie_args[[i]]
+      names(sublist) <- paste0(names(ie_args)[i], ".", names(sublist))
+      ie_args <- c(ie_args, sublist)
+      ie_args[[i]] <- NULL
+    } else {
+      checkmate::assert_scalar(ie_args[[i]], .var.name = names(ie_args)[i])
+      i <- i + 1
+    }
   }
   class(x) <- c("bayesbench_job_cfg", class(x))
   x
@@ -89,7 +104,7 @@ parse_cfg_list <- function(cfgs){
     if(is.null(cfg_list[[i]]$config_name)) {
       # Add config names if missing
       cfg_list[[i]]$config_name <- make.names(paste0("temp_config_",i,"_", Sys.time()))
-      cfg_list[[i]] <- cfg_list[[i]][c(length(cfg_list[[i]]),1:(length(cfg_list[[i]]) - 1))]
+      cfg_list[[i]] <- cfg_list[[i]][c(length(cfg_list[[i]]), 1:(length(cfg_list[[i]]) - 1))]
     }
     cfg_list[[i]] <- bayesbench_cfg_from_list(cfg_list[[i]]) # Just to reorder
   }
@@ -157,9 +172,24 @@ bayesbench_job_cfg_from_cfg <- function(x){
   expand_list <- list()
   expand_list[["inference_engine"]] <- x$inference_engine
   expand_list[["posterior_name"]] <- x$posterior_name
-  for(i in seq_along(x$inference_engine_arguments)){
-    if(length(x$inference_engine_arguments[[i]]) > 1) expand_list[[names(x$inference_engine_arguments)[i]]] <- x$inference_engine_arguments[[i]]
+  
+  ie_args <- x$inference_engine_arguments
+  names(ie_args) <- paste0("[[\"", names(ie_args), "\"]]")
+  i <- 1
+  while(i <= length(ie_args)){
+    if(is.list(ie_args[[i]])){
+      sublist <- ie_args[[i]]
+      names(sublist) <- paste0(names(ie_args)[i], "[[\"", names(sublist), "\"]]")
+      ie_args[[i]] <- NULL
+      ie_args <- c(ie_args, sublist)
+      next()
+    } 
+    if(length(ie_args[[i]]) > 1) {
+      expand_list[[names(ie_args)[i]]] <- ie_args[[i]]
+    }
+    i <- i + 1
   }
+
   expand_df <- expand.grid(expand_list, stringsAsFactors = FALSE)
   if(nrow(expand_df) == 1) {
     return(list(bayesbench_job_cfg(x)))
@@ -171,7 +201,9 @@ bayesbench_job_cfg_from_cfg <- function(x){
     job_cfg_list[[i]]$inference_engine <- expand_df$inference_engine[i]
     job_cfg_list[[i]]$posterior_name <- expand_df$posterior_name[i]
     for(j in 3:ncol(expand_df)){
-      job_cfg_list[[i]]$inference_engine_arguments[[names(expand_df)[j]]] <- expand_df[i,j]
+      eval(parse(text = paste0("job_cfg_list[[i]]$inference_engine_arguments",
+                               names(expand_df)[j],
+                               " <- expand_df[i,j]")))
     }
     job_cfg_list[[i]] <- bayesbench_job_cfg(job_cfg_list[[i]])
   }
