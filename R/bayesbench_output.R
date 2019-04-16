@@ -12,16 +12,14 @@
 bayesbench_output <- function(cfg, 
                               posterior,
                               posterior_predictive = NULL,
-                              log_p=NULL, 
-                              log_g=NULL, 
+                              diagnostics = NULL, 
                               inference_engine_content = NULL, 
                               output_log = NULL){
   
   output_list <- list()
   output_list$cfg <- cfg
   output_list$posterior <- posterior
-  output_list$diagnostics <- list(log_p = log_g, 
-                                  log_g = log_g)
+  output_list$diagnostics <- diagnostics
   output_list$inference_engine_content <- inference_engine_content
   output_list$output_log <- output_log
   
@@ -34,6 +32,7 @@ bayesbench_output <- function(cfg,
 
 assert_bayesbench_output <- function(x){
   checkmate::assert_class(x, classes = c("bayesbench_output", "list"))
+  x$inference_engine_content <- NULL
   xjson <- bayesbench_output_toJSON(x)
   schema_results <- validatejsonr::validate_json_with_schemafile(xjson, schemafn = system.file("extdata", "schemas", "bayesbench_output_schema.json", package = "bayesbenchr"))
   if(schema_results$value > 0) stop("(", schema_results$value, ") ",  schema_results$message, "\nSchema: ", schema_results$schema)
