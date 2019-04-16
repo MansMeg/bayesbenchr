@@ -52,6 +52,7 @@ bayesbench_output_toJSON <- function(x){
   x
 }
 
+#' @export
 print.bayesbench_output <- function(x,...){
   cat("=== BAYESBENCH OUTPUT FOR ===\n")
   cat(bayesbench_cfg_toYAML(x$cfg))
@@ -102,10 +103,53 @@ dir.create.bayesbench_output <- function(bayesbench_output){
   dir.create(output_directory(bayesbench_output), showWarnings = FALSE, recursive = TRUE)
 }
 
-read_bayesbench_output_directory <- function(dir){
-  stop("Not implemented")
-  checkmate::assert_directory_exists(dir)
-  files <- dir()
-  read_bayesbench_output
+#' Read Bayesian outputs
+#' 
+#' @details 
+#' Read in bayesbench output jobs
+#' 
+#' @param x either file paths or a cfg object
+#' 
+#' @export
+read_bayesbench_outputs <- function(x){
+  if(checkmate::test_class(x, "bayesbench_cfg")){
+    file_paths <- output_file_path(x)
+  } else if(checkmate::test_file_exists(x)){
+    file_paths <- x
+  } else {
+    stop("x is of class ", class(x))
+  }
+  bbs <- list()
+  for(i in seq_along(file_paths)){
+    bbs[[i]] <- read_bayesbench_output(file_paths[i])
+  }
+  bbs
+}
+
+read_bayesbench_output <- function(path){
+  if(!checkmate::test_file_exists(path)){
+    warning(checkmate::check_file_exists(path))
+    return(NULL)
+  }
+  if(!checkmate::test_choice(tolower(file_extension(path)), c("zip", "json", "rda"))){
+    warning(path, " is not read. ", checkmate::check_choice(tolower(file_extension(path)), c("zip", "json", "rda")))
+    return(NULL)
+  }
+  
+  if(tolower(file_extension(path)) == "zip"){
+    tmp_dir <- file.path(tempdir(), "tmp_json")
+    dir.create(tmp_dir, showWarnings = FALSE)
+    path <- unzip(zipfile = path, exdir = tmp_dir)
+  }
+  if(tolower(file_extension(path)) == "json"){
+    bbjson <- jsonlite::read_json(path, simplifyVector = TRUE)
+    return(bayesbench_output(bbjson)) 
+  }
+  if(tolower(file_extension(path)) == "rda"){
+    content_name <- load(path)
+    eval(parse(text = paste0("bbo <- ", content_name)))
+    checkmate::assert_class(bbo, "bayesbench_output")
+    return(bbo) 
+  }
 }
 

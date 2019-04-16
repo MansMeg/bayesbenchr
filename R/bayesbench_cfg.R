@@ -12,8 +12,30 @@
 #' 
 #' @export
 bayesbench_cfg <- function(...){
-  bayesbench_cfg_from_list(...)
+  cfg <- list(...)
+  if(length(cfg) == 1 && checkmate::test_class(cfg[[1]], "bayesbench_cfg")){
+    assert_bayesbench_cfg(cfg[[1]])
+    return(cfg[[1]])
+  }
+  checkmate::assert_list(cfg)
+  checkmate::assert_names(names(cfg), must.include = c("inference_engine", "posterior_name"))
+  class(cfg) <- c("bayesbench_cfg", "list")
+  assert_bayesbench_cfg(cfg)
+  cfg
 }
+
+#' @export
+bayesbench_job_cfg <- function(x){
+  x <- bayesbench_cfg(x)
+  checkmate::assert_string(x$inference_engine)
+  checkmate::assert_string(x$posterior_name)
+  for(i in seq_along(x$inference_engine_arguments)){
+    checkmate::assert_true(length(x$inference_engine_arguments[[i]]) == 1L)
+  }
+  class(x) <- c("bayesbench_job_cfg", class(x))
+  x
+}
+
 
 #' @rdname bayesbench_cfg
 #' @export
@@ -58,13 +80,6 @@ parse_read_cfg_object <- function(x){
   cfgs
 }
 
-bayesbench_cfg_from_list <- function(cfg){
-  checkmate::assert_list(cfg)
-  checkmate::assert_names(names(cfg), must.include = c("inference_engine", "posterior_name"))
-  class(cfg) <- c("bayesbench_cfg", "list")
-  assert_bayesbench_cfg(cfg)
-  cfg
-}
 
 parse_cfg_list <- function(cfgs){
   checkmate::assert_list(cfgs)
@@ -164,14 +179,3 @@ bayesbench_job_cfg_from_cfg <- function(x){
 }
 
 
-bayesbench_job_cfg <- function(x){
-  checkmate::assert_class(x, "bayesbench_cfg")
-  x <- bayesbench_cfg(x)
-  checkmate::assert_string(x$inference_engine)
-  checkmate::assert_string(x$posterior_name)
-  for(i in seq_along(x$inference_engine_arguments)){
-    checkmate::assert_true(length(x$inference_engine_arguments[[i]]) == 1L)
-  }
-  class(x) <- c("bayesbench_job_cfg", class(x))
-  x
-}
