@@ -5,7 +5,7 @@
 \title{Create a Bayesbench ouput object}
 \usage{
 bayesbench_output(cfg, posterior, posterior_predictive = NULL,
-  log_p = NULL, log_g = NULL, inference_engine_content = NULL,
+  diagnostics = NULL, inference_engine_content = NULL,
   output_log = NULL)
 }
 \arguments{
@@ -15,9 +15,9 @@ bayesbench_output(cfg, posterior, posterior_predictive = NULL,
 
 \item{posterior_predictive}{A list of posterior predictives, one array per parameter predictive}
 
-\item{log_p}{The log target density (log posterior mostly) for each draw}
-
 \item{inference_engine_content}{a list of inference_engine specific content (these need stored be handled separately)}
+
+\item{log_p}{The log target density (log posterior mostly) for each draw}
 
 \item{log_q}{The log proposal density (log approximate posterior) for each draw}
 
