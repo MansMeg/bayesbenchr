@@ -29,10 +29,13 @@ test_that("test bayesbench config and job config", {
   expect_silent(cfg  <-  bayesbench_cfg(posterior_name = "8_schools|noncentered",
                                         inference_engine = "stan_sampling",
                                         posterior_database_path = "minimal_posterior_database"))
+  expect_silent(x <- bayesbenchr:::bayesbench_job_cfg_from_cfg(x = cfg))
   
   expect_silent(cfg  <-  bayesbench_cfg(posterior_name = c("8_schools|noncentered", "8_schools|centered"),
                                         inference_engine = "stan_sampling",
                                         posterior_database_path = "minimal_posterior_database"))
+  # Test expanding complex config
+  expect_silent(x <- bayesbenchr::: bayesbench_job_cfg_from_cfg(x = cfg))
   
   skip("Fix later")
   # Test for warnings with duplicates/erroneus engine
@@ -66,3 +69,7 @@ test_that("test bayesbench config and job config", {
                                        posterior_database_path = "blah"))  
 
 })
+
+
+
+

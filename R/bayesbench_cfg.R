@@ -186,24 +186,27 @@ bayesbench_job_cfg_from_cfg <- function(x){
   expand_list[["posterior_name"]] <- x$posterior_name
   
   ie_args <- x$inference_engine_arguments
-  names(ie_args) <- paste0("[[\"", names(ie_args), "\"]]")
-  i <- 1
-  while(i <= length(ie_args)){
-    if(is.list(ie_args[[i]])){
-      sublist <- ie_args[[i]]
-      names(sublist) <- paste0(names(ie_args)[i], "[[\"", names(sublist), "\"]]")
-      ie_args[[i]] <- NULL
-      ie_args <- c(ie_args, sublist)
-      next()
-    } 
-    if(length(ie_args[[i]]) > 1) {
-      expand_list[[names(ie_args)[i]]] <- ie_args[[i]]
+  if(!is.null(ie_args)){
+    names(ie_args) <- paste0("[[\"", names(ie_args), "\"]]")
+    i <- 1
+    while(i <= length(ie_args)){
+      if(is.list(ie_args[[i]])){
+        sublist <- ie_args[[i]]
+        names(sublist) <- paste0(names(ie_args)[i], "[[\"", names(sublist), "\"]]")
+        ie_args[[i]] <- NULL
+        ie_args <- c(ie_args, sublist)
+        next()
+      } 
+      if(length(ie_args[[i]]) > 1) {
+        expand_list[[names(ie_args)[i]]] <- ie_args[[i]]
+      }
+      i <- i + 1
     }
-    i <- i + 1
   }
 
   expand_df <- expand.grid(expand_list, stringsAsFactors = FALSE)
   if(nrow(expand_df) == 1) {
+    x$config_name <- paste0(x$config_name, "_job1")
     return(list(bayesbench_job_cfg(x)))
   }
   job_cfg_list <- list()
@@ -212,10 +215,12 @@ bayesbench_job_cfg_from_cfg <- function(x){
     job_cfg_list[[i]]$config_name <- paste0(job_cfg_list[[i]]$config_name, "_job", i)
     job_cfg_list[[i]]$inference_engine <- expand_df$inference_engine[i]
     job_cfg_list[[i]]$posterior_name <- expand_df$posterior_name[i]
-    for(j in 3:ncol(expand_df)){
-      eval(parse(text = paste0("job_cfg_list[[i]]$inference_engine_arguments",
-                               names(expand_df)[j],
-                               " <- expand_df[i,j]")))
+    if(ncol(expand_df)>3){
+      for(j in 3:ncol(expand_df)){
+        eval(parse(text = paste0("job_cfg_list[[i]]$inference_engine_arguments",
+                                 names(expand_df)[j],
+                                 " <- expand_df[i,j]")))
+      }
     }
     job_cfg_list[[i]] <- bayesbench_job_cfg(job_cfg_list[[i]])
   }
