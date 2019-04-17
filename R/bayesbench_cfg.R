@@ -13,12 +13,20 @@
 #' @export
 bayesbench_cfg <- function(...){
   cfg <- list(...)
+  # If a bayesbench_cfg is supplied
   if(length(cfg) == 1 && checkmate::test_class(cfg[[1]], "bayesbench_cfg")){
     assert_bayesbench_cfg(cfg[[1]])
     return(cfg[[1]])
   }
+  
+  # If a list with arguments is supplied
+  if(length(cfg) == 1 && checkmate::test_list(cfg[[1]])){
+    cfg <- cfg[[1]]
+  }
+  
   checkmate::assert_list(cfg)
   checkmate::assert_names(names(cfg), must.include = c("inference_engine", "posterior_name"))
+  
   if(is.null(cfg$config_name)) {
     cfg$config_name <- make.names(paste0("temp_config_", Sys.time()))
     cfg <- cfg[c(length(cfg), 1:(length(cfg)-1))]
@@ -88,9 +96,9 @@ file_extension <- function(x){
 parse_read_cfg_object <- function(x){
   checkmate::assert_list(x)
   if(checkmate::test_names(names(x), must.include = c("inference_engine", "posterior_name"))){
-    cfgs <- list(bayesbench_cfg_from_list(x))
+    cfgs <- list(bayesbench_cfg(x))
   } else {
-    cfgs <- parse_cfg_list(x)    
+    cfgs <- parse_cfg_list(cfgs = x)    
   }
   cfgs
 }
@@ -100,13 +108,13 @@ parse_cfg_list <- function(cfgs){
   checkmate::assert_list(cfgs)
   cfg_list <- list()
   for(i in seq_along(cfgs)){
-    cfg_list[[i]] <- bayesbench_cfg_from_list(cfgs[[i]])
+    cfg_list[[i]] <- bayesbench_cfg(cfgs[[i]])
     if(is.null(cfg_list[[i]]$config_name)) {
       # Add config names if missing
       cfg_list[[i]]$config_name <- make.names(paste0("temp_config_",i,"_", Sys.time()))
       cfg_list[[i]] <- cfg_list[[i]][c(length(cfg_list[[i]]), 1:(length(cfg_list[[i]]) - 1))]
     }
-    cfg_list[[i]] <- bayesbench_cfg_from_list(cfg_list[[i]]) # Just to reorder
+    cfg_list[[i]] <- bayesbench_cfg(cfg_list[[i]]) # Just to reorder
   }
   cfg_list
 }
@@ -143,7 +151,11 @@ bayesbench_cfg_toYAML <- function(x){
 
 #'@export
 print.bayesbench_cfg <- function(x,...){
-  cat("=== BAYESBENCH CONFIG ===\n")
+  if(checkmate::test_class(x, "bayesbench_job_cfg")){
+    cat("### BAYESBENCH (JOB) CONFIG ###\n")
+  } else {
+    cat("### BAYESBENCH CONFIG ###\n")
+  }
   cat(bayesbench_cfg_toYAML(x))
 }
 
