@@ -14,3 +14,4 @@ Imports:
   jsonlite,
   yaml
 RoxygenNote: 6.1.0
+Suggests: testthat

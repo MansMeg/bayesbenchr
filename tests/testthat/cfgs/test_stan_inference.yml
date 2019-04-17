@@ -1,0 +1,41 @@
+
+- config_name: test_8schools_advi1
+  diagnostics:
+  - psis_khat
+  inference_engine: stan_vb
+  inference_engine_arguments:
+    vb: 
+      iter: 1000
+      tol_rel_obj: [0.01, 0.0001]
+  output: 
+    directory: test_output
+  posterior_database_path: minimal_posterior_database
+  posterior_name: ["8_schools|centered", "8_schools|noncentered"]
+
+- diagnostics:
+  - psis_khat
+  inference_engine: stan_vb
+  inference_engine_arguments:
+    iter: 1000
+    tol_rel_obj: 0.01
+  output: 
+    directory: test_output
+    type: rds
+  posterior_database_path: minimal_posterior_database
+  posterior_name: "8_schools|noncentered"
+
+- config_name: test_blr
+  diagnostics:
+  - psis_khat
+  inference_engine: ["stan_sampling", "stan_optimizing"]
+  inference_engine_arguments:
+    sampling:
+      chains: 1
+    optimize:
+      draws: 100
+    keep_stan_object: true
+  output: 
+    directory: test_output
+    type: json
+  posterior_database_path: minimal_posterior_database
+  posterior_name: ["sblrD5N50I|blr.json"]
