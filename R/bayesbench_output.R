@@ -58,8 +58,15 @@ print.bayesbench_output <- function(x,...){
 }
 
 
-
-write_bayesbench_outputs <- function(bayesbench_outputs){
+#' Write bayesbench outputs to file
+#' 
+#' @details 
+#' Will write \code{bayesbench_outputs} to file(s) according to the \code{bayesbench_outputs} configs.
+#' Specifying \code{output_directory} or \code{output_type} will update the config with these values
+#' and then write it to file(s).
+#' 
+#' @export
+write_bayesbench_outputs <- function(bayesbench_outputs, output_directory = NULL, output_type = NULL){
   if(checkmate::test_class(bayesbench_outputs, "bayesbench_output")){
     bayesbench_outputs <- list(bayesbench_outputs)
   }
@@ -67,12 +74,18 @@ write_bayesbench_outputs <- function(bayesbench_outputs){
     checkmate::assert_class(bayesbench_outputs[[i]], "bayesbench_output", null.ok = TRUE)
   }
   
+  
   for(i in seq_along(bayesbench_outputs)){
+    if(!is.null(output_directory)) output_directory(bayesbench_outputs[[i]]) <- output_directory
+    if(!is.null(output_type)) output_type(bayesbench_outputs[[i]]) <- output_type
+    
     if(is.null(bayesbench_outputs[[i]])) next()
+    if(is.null(output_directory(bayesbench_outputs[[i]]))) next()
     dir.create.bayesbench_output(bayesbench_outputs[[i]])
     write_bayesbench_output(bayesbench_output = bayesbench_outputs[[i]])
   }
-  return(TRUE)
+  
+  return(bayesbench_outputs)
 }
 
 write_bayesbench_output <- function(bayesbench_output){

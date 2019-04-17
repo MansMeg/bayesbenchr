@@ -22,8 +22,6 @@ bayesbench_run <- function(cfg){
 
   # Create job configs
   cfgs <- expand_bayesbench_cfg_to_job_cfgs(cfg)
-
-  # Check that all configs are ok.
   
   # Run all jobs
   pb <- progress::progress_bar$new(format = "Running Bayesbench [:bar] :percent in :elapsed", total = length(cfgs), clear = FALSE)
