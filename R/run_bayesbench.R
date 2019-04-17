@@ -28,15 +28,14 @@ bayesbench_run <- function(cfg){
   results <- list()
   for(i in seq_along(cfgs)){
     pb$tick()
-    if(file.exists(output_file_path(cfgs[[i]]))) {
-      message("Skipped ", config_name(cfgs[[i]]), " (set \"output force: true\" to force job).")
+    if(output_file_exist(cfgs[[i]])) {
+      message("Skipped ", config_name(cfgs[[i]]), "")
       next()
     }
     start_time <- Sys.time()
     inference_engine <- inference_engine_function(cfgs[[i]])
     results[[i]] <- inference_engine(cfg = cfgs[[i]])
     end_time <- Sys.time()
-    if(verbose(results[[i]])) cat(results[[i]]$output_log, sep = "\n")
     #add_start_time(results[[i]]) <- start_time
     #add_end_time(results[[i]]) <- end_time
   }

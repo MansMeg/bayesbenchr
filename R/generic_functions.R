@@ -101,17 +101,30 @@ output_file_path.bayesbench_cfg <- function(x){
 }
 
 output_file_path.bayesbench_job_cfg <- function(x){
+  output_dir <- output_directory(x)
+  if(is.null(output_dir)) return(NULL)
   file_ext <- output_type(x)
   if(file_ext == "zip") file_ext <- "json.zip"
-  fp <- file.path(output_directory(x), output_name(x))
-  fp <- paste0(fp, ".", file_ext)
-  fp
+  paste0(file.path(output_dir, output_name(x)), ".", file_ext)
 }
 
 output_file_path.bayesbench_output <- function(x){
   output_file_path(x$cfg)
 }
 
+output_file_exist <- function(x){
+  UseMethod("output_file_exist", x)
+}
+output_file_exist.bayesbench_cfg <- function(x){
+  ofp <- output_file_path(x)
+  !is.null(ofp) && file.exists(ofp)
+}
+output_file_exist.bayesbench_job_cfg <- function(x){
+  output_file_exist.bayesbench_cfg(x)
+}
+output_file_exist.bayesbench_output <- function(x){
+  output_file_exist.bayesbench_cfg(x$cfg)
+}
 
 #' @export
 output_name <- function(x){
@@ -131,35 +144,83 @@ output_name.bayesbench_output <- function(x){
 output_directory<- function(x){
   UseMethod("output_directory", x)
 }
+#' @export
+'output_directory<-' <- function(x, value){
+  UseMethod('output_directory<-', x)
+}
 
 output_directory.bayesbench_cfg <- function(x){
   x$output$directory
+}
+'output_directory<-.bayesbench_cfg' <- function(x, value){
+  if(is.null(x$output)){
+    x$output <- list(directory = value)
+  } else {
+    x$output$directory <- value
+  }
+  bayesbench_cfg(x)
+  return(x)
 }
 
 output_directory.bayesbench_job_cfg <- function(x){
   output_directory.bayesbench_cfg(x)
 }
+'output_directory<-.bayesbench_job_cfg' <- function(x, value){
+  x <- `output_directory<-.bayesbench_cfg`(x, value)
+  assert_bayesbench_job_cfg(x)
+  return(x)
+}
 
 output_directory.bayesbench_output <- function(x){
   output_directory(x$cfg)
+}
+'output_directory<-.bayesbench_output' <- function(x, value){
+  output_directory(x$cfg) <- value
+  assert_bayesbench_output(x)
+  return(x)
 }
 
 #' @export
 output_type<- function(x){
   UseMethod("output_type", x)
 }
+#' @export
+'output_type<-' <- function(x, value){
+  UseMethod('output_type<-', x)
+}
 
 output_type.bayesbench_cfg <- function(x){
-  if(is.null(x$output$type)){
-    return("zip")
+  x$output$type
+}
+'output_type<-.bayesbench_cfg' <- function(x, value){
+  if(is.null(x$output)){
+    x$output <- list(type = value)
   } else {
-    return(x$output$type)
+    x$output$type <- value
   }
+  assert_bayesbench_cfg(x)
+  return(x)
+}
+
+output_type.bayesbench_job_cfg <- function(x){
+  output_type.bayesbench_cfg(x)
+}
+'output_type<-.bayesbench_job_cfg' <- function(x, value){
+  x <- `output_type<-.bayesbench_cfg`(x, value)
+  assert_bayesbench_job_cfg(x)
+  return(x)
 }
 
 output_type.bayesbench_output <- function(x){
   output_type(x$cfg)
 }
+'output_type<-.bayesbench_output' <- function(x, value){
+  output_type(x$cfg) <- value
+  assert_bayesbench_output(x)
+  return(x)
+}
+
+
 
 
 #' @export

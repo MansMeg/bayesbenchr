@@ -42,6 +42,7 @@ bayesbench_job_cfg <- function(x){
   checkmate::assert_string(x$inference_engine)
   checkmate::assert_string(x$posterior_name)
   
+  
   ie_args <- x$inference_engine_arguments
   i <- 1
   while(i <= length(ie_args)){
@@ -56,6 +57,7 @@ bayesbench_job_cfg <- function(x){
     }
   }
   class(x) <- c("bayesbench_job_cfg", class(x))
+  x <- add_default_arguments(x)
   x
 }
 
@@ -227,4 +229,13 @@ bayesbench_job_cfg_from_cfg <- function(x){
   return(job_cfg_list)
 }
 
+
+add_default_arguments <- function(cfg){
+  checkmate::assert_class(cfg, "bayesbench_job_cfg")
+  if(!is.null(cfg$output)){
+    if(is.null(output_directory(cfg))) output_directory(cfg) <- "temp_output"
+    if(is.null(output_type(cfg))) output_type(cfg) <- "zip"
+  }
+  cfg
+}
 
