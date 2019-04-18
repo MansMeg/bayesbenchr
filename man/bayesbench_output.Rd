@@ -6,7 +6,7 @@
 \usage{
 bayesbench_output(cfg, posterior, posterior_predictive = NULL,
   diagnostics = NULL, inference_engine_content = NULL,
-  output_log = NULL)
+  output_log = NULL, output_time_stamps = NULL)
 }
 \arguments{
 \item{cfg}{The config object to return}

@@ -14,7 +14,12 @@ bayesbench_output <- function(cfg,
                               posterior_predictive = NULL,
                               diagnostics = NULL, 
                               inference_engine_content = NULL, 
-                              output_log = NULL){
+                              output_log = NULL,
+                              output_time_stamps = NULL){
+  
+  checkmate::assert_character(output_log)
+  checkmate::assert_character(output_time_stamps)
+  checkmate::assert_named(output_time_stamps)
   
   output_list <- list()
   output_list$cfg <- cfg
@@ -22,6 +27,9 @@ bayesbench_output <- function(cfg,
   output_list$diagnostics <- diagnostics
   output_list$inference_engine_content <- inference_engine_content
   output_list$output_log <- output_log
+  r <- git2r::repository()
+  output_list$output_githash <- capture.output(print(r))
+  output_list$output_time_stamps <- c(output_time_stamps, c(output_created=as.character(Sys.time())))
   
   class(output_list) <- c("bayesbench_output", "list")
   assert_bayesbench_output(x = output_list)
@@ -53,8 +61,10 @@ bayesbench_output_toJSON <- function(x){
 
 #' @export
 print.bayesbench_output <- function(x,...){
-  cat("=== BAYESBENCH OUTPUT FOR ===\n")
-  cat(bayesbench_cfg_toYAML(x$cfg))
+  cat("=== BAYESBENCH OUTPUT ===\n")
+  cat(paste0(names(x$output_time_stamps),": ", x$output_time_stamps), sep="\n")
+  cat(x$output_githash[3], "\n\n")
+  cat(bayesbenchr:::bayesbench_cfg_toYAML(x$cfg))
 }
 
 
@@ -133,7 +143,7 @@ read_bayesbench_outputs <- function(x){
   }
   bbs <- list()
   for(i in seq_along(file_paths)){
-    bbs[[i]] <- read_bayesbench_output(file_paths[i])
+    bbs[[i]] <- read_bayesbench_output(path = file_paths[i])
   }
   bbs
 }
@@ -143,8 +153,8 @@ read_bayesbench_output <- function(path){
     warning(checkmate::check_file_exists(path))
     return(NULL)
   }
-  if(!checkmate::test_choice(tolower(file_extension(path)), c("zip", "json", "rda"))){
-    warning(path, " is not read. ", checkmate::check_choice(tolower(file_extension(path)), c("zip", "json", "rda")))
+  if(!checkmate::test_choice(tolower(file_extension(path)), c("zip", "json", "rds"))){
+    warning(path, " is not read. ", checkmate::check_choice(tolower(file_extension(path)), c("zip", "json", "rds")))
     return(NULL)
   }
   
@@ -157,9 +167,8 @@ read_bayesbench_output <- function(path){
     bbjson <- jsonlite::read_json(path, simplifyVector = TRUE)
     return(bayesbench_output(bbjson)) 
   }
-  if(tolower(file_extension(path)) == "rda"){
-    content_name <- load(path)
-    eval(parse(text = paste0("bbo <- ", content_name)))
+  if(tolower(file_extension(path)) == "rds"){
+    bbo <- readRDS(path)
     checkmate::assert_class(bbo, "bayesbench_output")
     return(bbo) 
   }

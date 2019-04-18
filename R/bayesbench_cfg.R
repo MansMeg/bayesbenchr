@@ -190,6 +190,10 @@ expand_bayesbench_cfg_to_job_cfgs <- function(cfg){
 
 bayesbench_job_cfg_from_cfg <- function(x){
   checkmate::assert_class(x, "bayesbench_cfg")
+  if(checkmate::test_class(x, "bayesbench_job_cfg")){
+    return(list(x))
+  }
+  
   expand_list <- list()
   expand_list[["inference_engine"]] <- x$inference_engine
   expand_list[["posterior_name"]] <- x$posterior_name

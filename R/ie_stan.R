@@ -8,6 +8,7 @@
 #' @return a \code{bayesbench_output} object
 stan_vb <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")
+  output_time_stamps <- c(engine_started=as.character(Sys.time()))
   
   pnm <- posterior_name(cfg)
   sm <- stan_model(cfg)
@@ -32,7 +33,8 @@ stan_vb <- function(cfg){
                          diagnostics = list(log_p = results@sim$diagnostics[[1]]$log_p__,
                                             log_g = results@sim$diagnostics[[1]]$log_g__),
                          inference_engine_content = iec,
-                         output_log = c(logs, mess_logs))
+                         output_log = c(logs, mess_logs),
+                         output_time_stamps = output_time_stamps)
   return(x)
 }
 
@@ -43,10 +45,13 @@ stan_vb <- function(cfg){
 #' @return a \code{bayesbench_output} object
 stan_sampling <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")
+  output_time_stamps <- c(engine_started=as.character(Sys.time()))
   
   pnm <- posterior_name(cfg)
   sm <- stan_model(cfg)
+
   sd <- jsonlite::read_json(data_file_path(cfg), simplifyVector = TRUE)
+
   cfg <- add_default_arguments_stan(cfg)
   ie_args <- inference_engine_arguments(cfg)
 
@@ -64,7 +69,8 @@ stan_sampling <- function(cfg){
   x <- bayesbench_output(cfg = cfg,
                          posterior = extract(results), 
                          inference_engine_content = iec,
-                         output_log = c(logs, mess_logs))
+                         output_log = c(logs, mess_logs),
+                         output_time_stamps = output_time_stamps)
   return(x)
 }
 
@@ -75,6 +81,7 @@ stan_sampling <- function(cfg){
 #' @return a \code{bayesbench_output} object
 stan_optimizing <- function(cfg){
   checkmate::assert_class(cfg, "bayesbench_job_cfg")
+  output_time_stamps <- c(engine_started=as.character(Sys.time()))
   
   pnm <- posterior_name(cfg)
   sm <- stan_model(cfg)
@@ -97,7 +104,8 @@ stan_optimizing <- function(cfg){
   x <- bayesbench_output(cfg = cfg,
                          posterior = NULL, 
                          inference_engine_content = iec,
-                         output_log = c(logs, mess_logs))
+                         output_log = c(logs, mess_logs),
+                         output_time_stamps = output_time_stamps)
   return(x)
 }
 
