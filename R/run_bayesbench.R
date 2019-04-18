@@ -38,10 +38,11 @@ bayesbench_run <- function(cfg){
     end_time <- Sys.time()
     #add_start_time(results[[i]]) <- start_time
     #add_end_time(results[[i]]) <- end_time
+    
+    # Write results (continously)
+    write_bayesbench_outputs(bayesbench_outputs = results[i])
   }
   
-  # Write results
-  write_bayesbench_outputs(bayesbench_outputs = results)
 
   # Warnings
   warning("diagnostics not implemented yet", call. = FALSE)
