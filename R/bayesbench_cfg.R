@@ -228,7 +228,7 @@ bayesbench_job_cfg_from_cfg <- function(x){
     job_cfg_list[[i]]$config_name <- paste0(job_cfg_list[[i]]$config_name, "_job", i)
     job_cfg_list[[i]]$inference_engine <- expand_df$inference_engine[i]
     job_cfg_list[[i]]$posterior_name <- expand_df$posterior_name[i]
-    if(ncol(expand_df)>3){
+    if(ncol(expand_df)>=3){
       for(j in 3:ncol(expand_df)){
         eval(parse(text = paste0("job_cfg_list[[i]]$inference_engine_arguments",
                                  names(expand_df)[j],
