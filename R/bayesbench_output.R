@@ -100,10 +100,10 @@ write_bayesbench_output <- function(bayesbench_output){
   } else if(output_type(bayesbench_output) == "json"){
     bbojson <- bayesbench_output_toJSON(bayesbench_output)
     writeLines(con = ofp, text = bbojson)
-  } else if(output_type(bayesbench_output) == "rda") {
-    save(bayesbench_output, file = ofp)
+  } else if(output_type(bayesbench_output) == "rds") {
+    saveRDS(bayesbench_output, file = ofp)
   } else{
-    stop(output_type(bayesbench_output), "not implemented.")
+    warning("'", output_type(bayesbench_output), "' output format is not implemented. No output written.")
   }
   return(TRUE)
 }
