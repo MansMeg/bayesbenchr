@@ -38,11 +38,21 @@ bayesbench_cfg <- function(...){
 
 #' @export
 bayesbench_job_cfg <- function(x){
+  if(checkmate::test_class(x, "bayesbench_job_cfg")){
+    assert_bayesbench_job_cfg(x)
+    return(x)
+  }
   x <- bayesbench_cfg(x)
+  class(x) <- c("bayesbench_job_cfg", class(x))
+  assert_bayesbench_job_cfg(x)
+  x <- add_default_arguments(x)
+  x
+}
+
+assert_bayesbench_job_cfg <- function(x){
+  checkmate::assert_class(x, classes = c("bayesbench_job_cfg", "list"))
   checkmate::assert_string(x$inference_engine)
   checkmate::assert_string(x$posterior_name)
-  
-  
   ie_args <- x$inference_engine_arguments
   i <- 1
   while(i <= length(ie_args)){
@@ -56,9 +66,6 @@ bayesbench_job_cfg <- function(x){
       i <- i + 1
     }
   }
-  class(x) <- c("bayesbench_job_cfg", class(x))
-  x <- add_default_arguments(x)
-  x
 }
 
 
