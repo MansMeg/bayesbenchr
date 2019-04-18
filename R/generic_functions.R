@@ -243,7 +243,7 @@ as.bayesbench_job_cfg<- function(x){
 }
 #' @export
 as.bayesbench_job_cfg.bayesbench_cfg <- function(x){
-  expand_bayesbench_cfg_to_job_cfgs(list(x))
+  expand_bayesbench_cfg_to_job_cfgs(cfg = list(x))
 }
 #' @export
 as.bayesbench_job_cfg.bayesbench_job_cfg <- function(x){
