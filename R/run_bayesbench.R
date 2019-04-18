@@ -29,7 +29,7 @@ bayesbench_run <- function(cfg){
   for(i in seq_along(cfgs)){
     pb$tick()
     if(output_file_exist(cfgs[[i]])) {
-      message("Skipped ", config_name(cfgs[[i]]), "")
+      message("Skipped ", config_name(cfgs[[i]]), " since output file exist. Use 'overwrite = TRUE' in config to force run.")
       next()
     }
     start_time <- Sys.time()
