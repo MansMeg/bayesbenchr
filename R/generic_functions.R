@@ -207,7 +207,7 @@ output_type.bayesbench_job_cfg <- function(x){
 }
 'output_type<-.bayesbench_job_cfg' <- function(x, value){
   x <- `output_type<-.bayesbench_cfg`(x, value)
-  assert_bayesbench_job_cfg(x)
+  x <- bayesbench_job_cfg(x)
   return(x)
 }
 
@@ -236,3 +236,16 @@ verbose.bayesbench_output <- function(x){
   verbose(x$cfg)
 }
 
+
+#' @export
+as.bayesbench_job_cfg<- function(x){
+  UseMethod("as.bayesbench_job_cfg", x)
+}
+#' @export
+as.bayesbench_job_cfg.bayesbench_cfg <- function(x){
+  expand_bayesbench_cfg_to_job_cfgs(list(x))
+}
+#' @export
+as.bayesbench_job_cfg.bayesbench_job_cfg <- function(x){
+  x
+}
